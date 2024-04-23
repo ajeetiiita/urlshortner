@@ -1,10 +1,6 @@
 package com.telusko.contest.service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +15,8 @@ public class UrlService {
 	UrlRepository url;
 
 	public List<Url> getAllUrl() {
-		return url.findAll();
+		List<Url> urls = url.findAll();
+		return urls;
 	}
 
 	public String filterUrl(String oUrl) {
@@ -32,12 +29,33 @@ public class UrlService {
 		return res.toString();
 	}
 
+	public Url getOriginalUrl(String shortUrl)
+	{
+		List<Url> allUrl = getAllUrl();
+		for(int i=0;allUrl!=null && i<allUrl.size();i++)
+		{
+			Url currentUrl = allUrl.get(i);
+			if(currentUrl.getShort_url().equals(shortUrl))
+			{
+				int accessCount = currentUrl.getAccess_count()+1;
+				String shorty = currentUrl.getShort_url();
+				String longUrl = currentUrl.getLong_url();
+				url.deleteById(currentUrl.getId());
+				url.save(new Url(shorty, longUrl, accessCount, currentUrl.getId()));
+				//currentUrl.setAccess_count(accessCount);
+				//url.save(currentUrl);
+				return currentUrl;
+			}
+		}
+		return null;
+	}
+
 	public String createUrl(String filterUrl, String originalUrl) {
 		// TODO Auto-generated method stub
 		List<Url> allUrl = getAllUrl(); // Get All UrlShortner
 		Set<String> uniqueSet = new HashSet();
-		allUrl.forEach(u -> uniqueSet.add(u.getOutputurl())); // Create Set of Unique Url
-		String res = "telus.ko/";
+		allUrl.forEach(u -> uniqueSet.add(u.getLong_url())); // Create Set of Unique Url
+		String res = "ushrt/";
 		StringBuilder sb = new StringBuilder();
 		while (true) {
 			for (int i = 0; i < 6; i++) {
@@ -47,10 +65,10 @@ public class UrlService {
 			if (!uniqueSet.contains(sb)) { //if generated url is unique break the loop then only
 				break;
 			}else {
-				res = "telus.ko/";
+				res = "ushrt/";
 			}
 		}
-		url.save(new Url(originalUrl, res));
+		url.save(new Url(res, originalUrl));
 		return res;
 	}
 }

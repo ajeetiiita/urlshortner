@@ -8,4 +8,5 @@ import com.telusko.contest.entity.Url;
 @Repository
 public interface UrlRepository extends JpaRepository<Url, Integer>{
 
+
 }
