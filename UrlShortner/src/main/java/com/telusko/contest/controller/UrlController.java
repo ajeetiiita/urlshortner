@@ -16,7 +16,7 @@ import com.telusko.contest.entity.Url;
 import com.telusko.contest.service.UrlService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class UrlController {
 
 	@Autowired
