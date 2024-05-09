@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 import com.telusko.contest.entity.Url;
 import com.telusko.contest.service.UrlService;
@@ -54,7 +56,32 @@ public class UrlController {
 	@PostMapping("/createUrl")
 	public String createUrl(@RequestBody Map<String, String> requestBody) {
 	    String inUrl = requestBody.get("inUrl");
+		boolean validUrl = isValid(inUrl);
+		if(!validUrl)
+		{
+			return "invalid url String please provide correct url";
+		}
 	    String temp = service.filterUrl(inUrl);
+		List<Url> urls = service.getAllUrl();
+        for (Url currentUrl : urls) {
+            if (currentUrl.getLong_url().equalsIgnoreCase(inUrl)) {
+                String shortUrlCreated = currentUrl.getShort_url();
+                return "Url already present you can use\t\t" + "'" +shortUrlCreated+"'";
+            }
+        }
 	    return service.createUrl(temp, inUrl);
+	}
+
+
+	public static boolean isValid(String urlString) {
+		try {
+			// Attempt to create a URL object from the given string
+			URL url = new URL(urlString);
+			// If no exception is thrown, the URL is valid
+			return true;
+		} catch (MalformedURLException e) {
+			// MalformedURLException is thrown if the URL is not valid
+			return false;
+		}
 	}
 }
